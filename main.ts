@@ -2,20 +2,24 @@ info.onScore(info.highScore(), function () {
     info.setScore(0)
     light.showAnimation(light.sparkleAnimation, 300)
 })
+info.onScore(11, function () {
+    game.gameOver(true)
+})
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     mySprite.y += 10
-})
-info.onScore(2, function () {
-    game.gameOver(true)
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Projectile, function (sprite, otherSprite) {
     info.changeLifeBy(-1)
 })
-info.onScore(info.score() / info.highScore(), function () {
-    game.showLongText("Wow you reached your High score!", DialogLayout.Bottom)
+info.onScore(5, function () {
+    sprites.destroy(projectile, effects.spray, 100)
 })
-let projectile2: Sprite = null
+info.onScore(info.score() / info.highScore(), function () {
+    mySprite.sayText("High score reached!")
+    info.setScore(Highscore)
+})
 let Highscore = 0
+let projectile: Sprite = null
 let mySprite: Sprite = null
 mySprite = sprites.create(img`
     . . . . . 2 2 2 . . . . . . . . 
@@ -55,7 +59,7 @@ let myEnemy = sprites.create(img`
     `, SpriteKind.Enemy)
 myEnemy.setPosition(140, 10)
 forever(function () {
-    myEnemy.follow(mySprite, 25)
+    myEnemy.follow(mySprite, 30)
     game.setGameOverScoringType(game.ScoringType.HighScore)
     mySprite.setStayInScreen(true)
     mySprite.sayText(info.highScore())
@@ -103,7 +107,8 @@ forever(function () {
     true
     )
     for (let index = 0; index < 99999; index++) {
-        projectile2 = sprites.createProjectileFromSprite(img`
+        let list: number[] = []
+        projectile = sprites.createProjectileFromSprite(img`
             . . . . . . . . . . . . . . . . 
             . . . . . . . . . . . . . . . . 
             . . . . . . . . . . . . . . . . 
@@ -120,10 +125,12 @@ forever(function () {
             . . . . . . . . . . . . . . . . 
             . . . . . . . . . . . . . . . . 
             . . . . . . . . . . . . . . . . 
-            `, myEnemy, 100, 100)
-        projectile2.x += 50
-        pause(3000)
+            `, myEnemy, 50, 100)
+        projectile.follow(mySprite, 20)
+        pause(2000)
         info.changeScoreBy(1)
+        list.push(info.score())
         Highscore += 1
+        projectile.x += 50
     }
 })
